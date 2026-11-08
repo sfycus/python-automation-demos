@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QuoteFlow · демо расчёта КП</title>
+  <style>
+    :root{font-family:Inter,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#eaf0f8;background:#0b1320}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 20% 0%,#183350 0,#0b1320 42%);min-height:100vh}
+    header{max-width:1120px;margin:auto;padding:26px 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #24364b}
+    .logo{font-size:19px;font-weight:800;letter-spacing:-.04em}.logo b{color:#67d6af}.pill{padding:7px 11px;border:1px solid #3f5a68;color:#a8c8ce;border-radius:999px;font-size:12px}
+    main{max-width:1120px;margin:auto;padding:47px 28px 80px}.eyebrow{font-size:12px;text-transform:uppercase;letter-spacing:.15em;color:#65d6af;font-weight:800}
+    h1{font-size:clamp(32px,4.5vw,54px);line-height:1.04;letter-spacing:-.05em;margin:12px 0 16px;max-width:800px}p.lead{font-size:17px;color:#aabbd0;max-width:730px;line-height:1.55;margin-bottom:34px}
+    .grid{display:grid;grid-template-columns:1.05fr .95fr;gap:18px}.card{background:#111f30;border:1px solid #2c4257;border-radius:17px;box-shadow:0 16px 50px #06101d55;padding:24px}.card h2{font-size:18px;margin:0 0 18px}.muted{color:#90a6bc;font-size:13px;line-height:1.5}
+    label{display:block;color:#b8ccdb;font-size:13px;font-weight:650;margin:15px 0 7px}input,select{width:100%;border:1px solid #3b5367;background:#0c1725;color:#eff7ff;border-radius:9px;padding:12px 13px;font-size:15px}input:focus,select:focus{outline:2px solid #6ddfbb;outline-offset:1px}
+    .row{display:grid;grid-template-columns:1fr 110px;gap:12px}.items{display:grid;gap:10px}.item{display:grid;grid-template-columns:1fr 92px 38px;gap:8px}.remove{border:1px solid #3b5367;background:#203148;color:#c6d6e6;border-radius:9px;cursor:pointer;font-size:22px}.add{margin-top:12px;border:1px dashed #5b8d91;background:transparent;color:#77dbbd;padding:10px 13px;border-radius:9px;cursor:pointer}.actions{display:flex;gap:9px;margin-top:25px}.primary{background:#68ddb2;color:#092219;border:0;border-radius:10px;padding:13px 17px;font-weight:800;cursor:pointer;font-size:15px}.secondary{background:#233c50;color:#d6e9f3;border:1px solid #416174;border-radius:10px;padding:13px 17px;font-weight:700;cursor:pointer}.secondary:disabled{opacity:.5;cursor:default}
+    .summary{background:#0c1827;border:1px solid #304b5c;border-radius:12px;padding:19px;margin-top:17px}.empty{display:grid;place-items:center;min-height:210px;color:#819cb0;text-align:center;line-height:1.5}.line{display:flex;justify-content:space-between;gap:15px;padding:9px 0;border-bottom:1px solid #223748;font-size:14px}.line:last-child{border:0}.total{font-size:26px;font-weight:800;color:#79e2bf}.warn{color:#ffb9a9;background:#432923;border:1px solid #7c4638;padding:11px 13px;border-radius:9px;margin-top:15px;display:none}.tag{font-size:11px;border:1px solid #6f7441;color:#d7db83;padding:4px 7px;border-radius:99px}.foot{margin-top:25px;color:#8298ad;font-size:12px}
+    @media(max-width:760px){.grid{grid-template-columns:1fr}main{padding:30px 17px 60px}header{padding:20px 17px}.card{padding:18px}.pill{display:none}}
+  </style>
+</head>
+<body>
+<header><div class="logo">Quote<b>Flow</b></div><div class="pill">Рабочий прототип · Python API + JavaScript</div></header>
+<main>
+  <div class="eyebrow">Портфолио / демо 01</div>
+  <h1>КП без ошибок в комплектации</h1>
+  <p class="lead">Менеджер выбирает оборудование и опции. Сервер проверяет совместимость, считает сумму по правилам компании и отдаёт черновик коммерческого предложения.</p>
+  <div class="grid">
+    <section class="card">
+      <h2>Новый расчёт <span class="tag">Черновик</span></h2>
+      <label for="customer">Клиент</label><input id="customer" value="ООО «СтройПроект»" maxlength="120">
+      <label>Позиции</label><div class="items" id="items"></div>
+      <button class="add" id="add" type="button">+ Добавить позицию</button>
+      <div class="row"><div><label for="discount">Скидка, %</label><input id="discount" type="number" min="0" max="15" step="0.5" value="5"></div><div></div></div>
+      <div class="actions"><button class="primary" id="calculate">Рассчитать КП</button><button class="secondary" id="download" disabled>Скачать HTML</button></div>
+      <div class="warn" id="error"></div>
+    </section>
+    <section class="card">
+      <h2>Предпросмотр результата</h2>
+      <p class="muted">Итоговая цена и отправка клиенту требуют подтверждения менеджером. Демо не выполняет электротехнические расчёты.</p>
+      <div class="summary" id="summary"><div class="empty">Нажмите «Рассчитать КП»,<br>чтобы увидеть проверенный черновик.</div></div>
+      <div class="foot">API: <code>GET /api/catalog</code> · <code>POST /api/quote</code><br>Данные демонстрационные, без внешних сервисов и секретных ключей.</div>
+    </section>
+  </div>
+</main>
+<script>
+const products={"GEN-12":"Генератор 12 кВт","GEN-20":"Генератор 20 кВт","ATS-12":"АВР до 12 кВт","ATS-20":"АВР до 20 кВт","SERVICE":"Пусконаладка"};
+const items=document.getElementById('items'),error=document.getElementById('error'),summary=document.getElementById('summary');
+let lastQuote=null;
+function addItem(sku='GEN-12',quantity=1){const row=document.createElement('div');row.className='item';const select=document.createElement('select');for(const [key,name] of Object.entries(products)){const opt=document.createElement('option');opt.value=key;opt.textContent=`${key} · ${name}`;select.append(opt)}select.value=sku;const input=document.createElement('input');input.type='number';input.min='1';input.max='100';input.value=quantity;input.setAttribute('aria-label','Количество');const remove=document.createElement('button');remove.className='remove';remove.textContent='×';remove.setAttribute('aria-label','Удалить позицию');remove.onclick=()=>row.remove();row.append(select,input,remove);items.append(row)}
+addItem('GEN-12');addItem('ATS-12');addItem('SERVICE');
+document.getElementById('add').onclick=()=>addItem('SERVICE');
+function rub(s){return Number(s).toLocaleString('ru-RU',{minimumFractionDigits:2,maximumFractionDigits:2})+' ₽'}
+function line(left,right,cl=''){const el=document.createElement('div');el.className='line '+cl;const l=document.createElement('span'),r=document.createElement('span');l.textContent=left;r.textContent=right;el.append(l,r);return el}
+function render(q){summary.replaceChildren();const title=document.createElement('div');title.style.cssText='font-weight:800;font-size:17px;margin-bottom:12px';title.textContent=q.customer;summary.append(title);for(const item of q.items)summary.append(line(`${item.name} × ${item.quantity}`,rub(item.line_total)));summary.append(line('Подытог',rub(q.subtotal)));summary.append(line(`Скидка ${q.discount_percent}%`,'− '+rub(q.discount_amount)));summary.append(line('Итого',rub(q.total),'total'))}
+document.getElementById('calculate').onclick=async()=>{error.style.display='none';lastQuote=null;document.getElementById('download').disabled=true;const payload={customer:document.getElementById('customer').value,discount_percent:document.getElementById('discount').value,items:[...items.children].map(row=>({sku:row.children[0].value,quantity:Number(row.children[1].value)}))};try{const response=await fetch('/api/quote',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});const data=await response.json();if(!response.ok)throw new Error(data.error||'Ошибка сервера');lastQuote=data;render(data);document.getElementById('download').disabled=false}catch(e){error.textContent=e.message;error.style.display='block'}};
+document.getElementById('download').onclick=()=>{if(!lastQuote)return;const escape=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));const q=lastQuote;const rows=q.items.map(i=>`<tr><td>${escape(i.name)}</td><td>${i.quantity}</td><td>${rub(i.line_total)}</td></tr>`).join('');const html=`<!doctype html><meta charset="utf-8"><title>Черновик КП</title><style>body{font-family:Arial,sans-serif;max-width:760px;margin:50px auto;color:#172432}table{width:100%;border-collapse:collapse}td,th{border-bottom:1px solid #ccd6df;padding:12px;text-align:left}footer{margin-top:40px;color:#687789}</style><h1>Черновик коммерческого предложения</h1><p>Клиент: ${escape(q.customer)}</p><table><tr><th>Позиция</th><th>Количество</th><th>Сумма</th></tr>${rows}</table><h2>Итого: ${rub(q.total)}</h2><footer>Требуется проверка и утверждение менеджером. Демо QuoteFlow.</footer>`;const url=URL.createObjectURL(new Blob([html],{type:'text/html'}));const a=document.createElement('a');a.href=url;a.download='quote-draft.html';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000)};
+</script>
+</body></html>
